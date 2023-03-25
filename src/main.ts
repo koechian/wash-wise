@@ -43,7 +43,11 @@ window.addEventListener("DOMContentLoaded", () => {
         ?.value,
     };
     // call login user function
-    login(userCredentials);
+    login(userCredentials).then(() => {
+      setTimeout(() => {
+        (loginForm as HTMLFormElement).reset();
+      }, 2000);
+    });
   });
 
   logoutButton?.addEventListener("click", (e) => {
@@ -54,12 +58,20 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 const login = async (userCredentials: { email: string; password: string }) => {
+  const loginSpinner = document.getElementById("login-spinner");
+
+  // show spinner
+  loginSpinner?.classList.remove("hidden");
+
   signInWithEmailAndPassword(
     auth,
     userCredentials.email,
     userCredentials.password
   )
     .then((userCredential) => {
+      // hide spinner
+      loginSpinner?.classList.add("hidden");
+
       // Signed in
       USER = userCredential.user;
 
@@ -67,12 +79,15 @@ const login = async (userCredentials: { email: string; password: string }) => {
       window.location.replace("landing.html");
     })
     .catch(async (error) => {
+      loginSpinner?.classList.add("hidden");
+
       switch (error.message) {
         case "Firebase: Error (auth/user-not-found).":
           await message(
             "This user does not exist, check your email",
             "Email not Found"
           );
+
           break;
         case "Firebase: Error (auth/wrong-password).":
           await message("Check your password and try again", "Wrong Password");
