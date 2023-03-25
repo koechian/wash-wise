@@ -12,10 +12,10 @@
   },
   "tauri": {
     "allowlist": {
-      "all": false,
-      "shell": {
-        "all": false,
-        "open": true
+      "dialog": {
+        "all": true,
+        "open": false,
+        "save": false
       }
     },
     "bundle": {
@@ -39,8 +39,8 @@
     "windows": [
       {
         "fullscreen": false,
-        "resizable": true,
-        "title": "wise-wash",
+        "resizable": false,
+        "title": "Wise Wash",
         "width": 800,
         "height": 600
       }
