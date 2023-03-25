@@ -7,6 +7,7 @@ import {
   signOut,
   User,
 } from "firebase/auth";
+import { message } from "@tauri-apps/api/dialog";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -52,7 +53,7 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-const login = (userCredentials: { email: string; password: string }) => {
+const login = async (userCredentials: { email: string; password: string }) => {
   signInWithEmailAndPassword(
     auth,
     userCredentials.email,
@@ -65,8 +66,24 @@ const login = (userCredentials: { email: string; password: string }) => {
       // user redirect
       window.location.replace("landing.html");
     })
-    .catch((error) => {
-      console.log(error);
+    .catch(async (error) => {
+      switch (error.message) {
+        case "Firebase: Error (auth/user-not-found).":
+          await message(
+            "This user does not exist, check your email",
+            "Email not Found"
+          );
+          break;
+        case "Firebase: Error (auth/wrong-password).":
+          await message("Check your password and try again", "Wrong Password");
+        case "Firebase: Error (auth/too-many-attempts).":
+          await message(
+            "You have tried too many times, try again later or contact admin for password reset",
+            "Too many tries"
+          );
+        default:
+          console.log("shit");
+      }
     });
 };
 
@@ -75,7 +92,7 @@ const logout = () => {
     .then(() => {
       window.location.replace("index.html");
     })
-    .catch((error) => {
-      console.log(error);
+    .catch(async (error) => {
+      await message(error.message, "Unexpected Error");
     });
 };
